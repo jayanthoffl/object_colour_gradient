@@ -1,0 +1,63 @@
+
+import cv2
+import numpy as np
+
+winname = "Frame:"
+
+def nothing(x):
+    pass
+
+cv2.namedWindow('Frame:')
+cv2.createTrackbar('H', winname, 0, 255, nothing)
+cv2.createTrackbar('S', winname, 0, 255, nothing)
+cv2.createTrackbar('V', winname, 0, 255, nothing)
+cv2.createTrackbar('H2', winname, 0, 255, nothing)
+cv2.createTrackbar('S2', winname, 0, 255, nothing)
+cv2.createTrackbar('V2', winname, 0, 255, nothing)
+
+
+cap = cv2.VideoCapture(0)
+
+print("check = ", cap.isOpened())
+
+
+while(cap.isOpened()):
+# Take each frame
+    _, frame = cap.read()
+    if _ == True:
+        # Convert BGR to HS
+        H = cv2.getTrackbarPos('H', 'Frame:')
+        S = cv2.getTrackbarPos('S', 'Frame:')
+        V = cv2.getTrackbarPos('V', 'Frame:')
+        H2 = cv2.getTrackbarPos('H2', 'Frame:')
+        S2 = cv2.getTrackbarPos('S2', 'Frame:')
+        V2 = cv2.getTrackbarPos('V2', 'Frame:')
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        # define range of blue color in HSV
+        lower_blue = np.array([H, S, V])
+        upper_blue = np.array([H2, S2, V2])
+        lower_green = np.array([H, S, V])
+        upper_green = np.array([H2, S2, V2])
+        lower_red = np.array([H, S, V])
+        upper_red = np.array([H2, S2, V2])
+        frame = cv2.resize(frame,(720,480))
+        # Threshold the HSV image to get only blue colors
+        blue_mask = cv2.inRange(hsv, lower_blue, upper_blue)             #these are HSV value of the colours                    
+        green_mask = cv2.inRange(hsv, lower_green, upper_green)             #these are HSV value of the colours
+        red_mask = cv2.inRange(hsv, lower_red, upper_red)             #these are HSV value of the colours
+        blue_mask = cv2.resize(blue_mask,(720,480))
+        red_mask = cv2.resize(red_mask,(720,480))
+        green_mask = cv2.resize(green_mask,(720,480))
+        mask = cv2.addWeighted(blue_mask, 1.0, green_mask, 1.0, 0.0)          #addWeigther is used to sync two colours
+        mask = cv2.addWeighted(mask, 1.0, red_mask, 1.0, 0.0)          # the numbers are the intensities each image will blend
+        # Bitwise-AND mask and original image
+        res = cv2.bitwise_and(frame,frame, mask= mask)
+        res = cv2.resize(res,(720,480))
+        cv2.imshow('frame',frame)
+        cv2.imshow('mask',mask)
+        cv2.imshow('res',res)
+        
+        if cv2.waitKey(5) & 0xFF == ord('q'):                 #here 1 is for video and 0 is for image
+                break
+cap.release()
+cv2.destroyAllWindows()
