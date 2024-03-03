@@ -1,3 +1,52 @@
+# blending multiple  colours in one output
+
+'''
+import cv2
+import numpy as np
+
+camera = "https://10.1.183.167:8080/video"                      # online Camera instead of in-built
+cap = cv2.VideoCapture(camera)
+cap.open(camera)
+print("check = ", cap.isOpened())
+
+
+while(cap.isOpened()):
+# Take each frame
+    _, frame = cap.read()
+    if _ == True:
+        # Convert BGR to HS
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        # define range of blue color in HSV
+        lower_blue = np.array([110,50,50])
+        upper_blue = np.array([130,255,255])
+        lower_green = np.array([50, 50, 120])
+        upper_green = np.array([70, 255, 255])
+        lower_red = np.array([0, 70, 50])
+        upper_red = np.array([10, 255, 255])
+        frame = cv2.resize(frame,(720,480))
+        # Threshold the HSV image to get only blue colors
+        blue_mask = cv2.inRange(hsv, lower_blue, upper_blue)             #these are HSV value of the colours                    
+        green_mask = cv2.inRange(hsv, lower_green, upper_green)             #these are HSV value of the colours
+        red_mask = cv2.inRange(hsv, lower_red, upper_red)             #these are HSV value of the colours
+        blue_mask = cv2.resize(blue_mask,(720,480))
+        red_mask = cv2.resize(red_mask,(720,480))
+        green_mask = cv2.resize(green_mask,(720,480))
+        mask = cv2.addWeighted(blue_mask, 1.0, green_mask, 1.0, 0.0)          #addWeigther is used to sync two colours
+        mask = cv2.addWeighted(mask, 1.0, red_mask, 1.0, 0.0)          # the numbers are the intensities each image will blend
+        # Bitwise-AND mask and original image
+        res = cv2.bitwise_and(frame,frame, mask= mask)
+        res = cv2.resize(res,(720,480))
+        cv2.imshow('frame',frame)
+        cv2.imshow('mask',mask)
+        cv2.imshow('res',res)
+        
+        if cv2.waitKey(5) & 0xFF == ord('q'):                 #here 1 is for video and 0 is for image
+                break
+cap.release()
+cv2.destroyAllWindows()
+
+'''
+
 
 import cv2
 import numpy as np
